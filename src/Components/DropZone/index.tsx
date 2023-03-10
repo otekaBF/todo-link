@@ -45,7 +45,7 @@ function RemoveImageDialog({
       <AlertDialogOverlay>
         <AlertDialogContent>
           <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-            Eliminar imagen
+            Delete image
           </AlertDialogHeader>
 
           <AlertDialogBody>
@@ -69,13 +69,13 @@ function RemoveImageDialog({
                   />
                 )}
               </Box>
-              <Text>Deseas eliminar esta imagen?</Text>
+              <Text>Do you whant to delete the image?</Text>
             </HStack>
           </AlertDialogBody>
 
           <AlertDialogFooter>
             <Button type='button' ref={cancelRef as any} onClick={onClose}>
-              Cancelar
+              cancel
             </Button>
             <Button
               colorScheme='red'
@@ -85,7 +85,7 @@ function RemoveImageDialog({
                 onClose()
               }}
               ml={3}>
-              Eliminar
+              Delete
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -128,7 +128,7 @@ export const DropZone = ({ images, onChange, isError }: IDropZoneProps) => {
     index: number
   } | null>(null)
   const toast = useToast()
-  const maxNumber = 4
+  const maxNumber = 1
 
   return (
     <ImageUploading
@@ -184,11 +184,11 @@ export const DropZone = ({ images, onChange, isError }: IDropZoneProps) => {
                 fontWeight='semibold'
                 _hover={{ color: 'blue.700' }}
                 onClick={onImageUpload}>
-                click aquí para subir
+                click here to upload 
               </Text>{' '}
-              o desliza tus imagenes
+              or drag and drop your image here
             </Box>
-            <Box fontWeight='light'>PNG, JPG o GIF menores a 2MB</Box>
+            <Box fontWeight='light'>PNG, JPG or GIF</Box>
           </Flex>
           <Grid
             mt={3}
