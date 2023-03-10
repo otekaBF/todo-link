@@ -14,11 +14,12 @@ import {
   Spacer,
   Checkbox,
   IconButton,
+  Image,
 } from "@chakra-ui/react";
 
 import { createClient } from "@supabase/supabase-js";
 import { MdDeleteOutline } from "react-icons/md";
-// import { DropZone } from '@/Components/DropZone'
+import { DropZone } from "@/Components/DropZone";
 
 const supabaseUrl = "https://abghecgrcejwvmgtliex.supabase.co";
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY;
@@ -32,14 +33,32 @@ function parseDate(date: string) {
   const year = newDate.getFullYear();
   return `${day}/${month}/${year}`;
 }
+
+export const randomString = (length: number) => {
+  const chars =
+    "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let result = "";
+  for (let i = length; i > 0; --i)
+    result += chars[Math.floor(Math.random() * chars.length)];
+  return result;
+};
+
+const uploadImage = async (file: File) => {
+  return await supabase.storage.from("images").upload(randomString(32), file, {
+    cacheControl: "3600",
+    upsert: false,
+  });
+};
+
 interface ITask {
   id: number;
   task: string;
   created_at: string;
   complete: boolean;
+  image: string;
 }
 export default function Home(): React.ReactElement {
-  // const [ images, setImages] = useState([])
+  const [images, setImages] = useState<{ file?: File; dataURL: string }[]>([]);
   const [task, setTask] = useState("");
   const [tasks, setTasks] = useState<ITask[]>([]);
 
@@ -51,10 +70,14 @@ export default function Home(): React.ReactElement {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { data, error } = await supabase
+    const files = images.map((image) => image.file);
+    const uploadedImage = await uploadImage(files[0] as File);
+    console.log(uploadedImage);
+    await supabase
       .from("tasks")
-      .insert([{ task: task }]);
+      .insert([{ task: task, image: uploadedImage?.data?.path as string }]);
     getTasks();
+    setImages([]);
   };
 
   const handleCkeckTask = async (id: number, complete: boolean) => {
@@ -98,7 +121,13 @@ export default function Home(): React.ReactElement {
             Create
           </Button>
         </HStack>
-        <Card mt={8}>
+        <Box my={8}>
+          <DropZone
+            images={images}
+            onChange={(images) => setImages(images as never[])}
+          />
+        </Box>
+        <Card>
           <CardHeader>
             <Heading size="md">My Tasks</Heading>
           </CardHeader>
@@ -111,6 +140,15 @@ export default function Home(): React.ReactElement {
                     {parseDate(taskItem.created_at)}
                   </Heading>
                   <HStack>
+                    <Box overflow="hidden" rounded="md" width="80px" height="80px">
+                      <Image
+                        width="full"
+                        height="full"
+                        objectFit="cover"
+                        src={`https://abghecgrcejwvmgtliex.supabase.co/storage/v1/object/public/images/${taskItem.image}`}
+                        alt={taskItem.task}
+                      />
+                    </Box>
                     <Box display="flex" alignItems="center">
                       <Checkbox
                         isChecked={taskItem.complete}
@@ -136,7 +174,6 @@ export default function Home(): React.ReactElement {
             </Stack>
           </CardBody>
         </Card>
-        {/* <DropZone images={images} onChange={ (images) => setImages(images as never[])}  /> */}
       </Box>
     </div>
   );
