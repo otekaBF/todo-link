@@ -17,6 +17,7 @@ import {
   Image,
 } from "@chakra-ui/react";
 
+
 import { createClient } from "@supabase/supabase-js";
 import { MdDeleteOutline } from "react-icons/md";
 import { DropZone } from "@/Components/DropZone";
